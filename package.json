@@ -1,0 +1,23 @@
+{
+  "name": "sea-builder",
+  "version": "1.0.0",
+  "description": "A simple builder manager to help users build Single Application Executables  for TS/JS and Node Apps",
+  "main": "index.js",
+  "bin": {
+    "sea-builder": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "AxDSan @ (https://www.github.com/AxDSan)",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "esbuild": "^0.20.2",
+    "figlet": "^1.7.0",
+    "log4js": "^6.9.1",
+    "postject": "^1.0.0-alpha.6",
+    "rcedit": "^4.0.1"
+  }
+}
