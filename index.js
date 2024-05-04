@@ -16,35 +16,6 @@ const JsConfuser = require("js-confuser");
 // Use dynamic import for ESM modules
 Promise.all([import("chalk"), import("figlet"), import("log4js")])
   .then(([{ default: chalk }, { default: figlet }, { default: log4js }]) => {
-    log4js.configure({
-      appenders: {
-        console: { type: "console" },
-      },
-      categories: {
-        default: { appenders: ["console"], level: "debug" },
-      },
-    });
-
-    const logger = log4js.getLogger();
-
-    const program = new commander.Command();
-
-    program
-      .version("1.0.0")
-      .description(
-        "Build a Single Executable Application (SEA) from a Node.js project"
-      )
-      .requiredOption("-i, --input <file>", "Input file (e.g. server.ts)")
-      .option(
-        "-icon, --icon <file>",
-        "Icon file (e.g. icon.ico) [Windows only]"
-      )
-      .requiredOption(
-        "-p, --platform <platform>",
-        "Target platform (win32, linux, or macos)"
-      )
-      .parse(process.argv);
-
     const showSplash = () => {
       console.log(
         figlet.textSync("SEA-Builder", {
@@ -76,6 +47,37 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
       console.log("  sea-builder -i server.ts -p macos");
       console.log("");
     };
+
+    log4js.configure({
+      appenders: {
+        console: { type: "console" },
+      },
+      categories: {
+        default: { appenders: ["console"], level: "debug" },
+      },
+    });
+
+    const logger = log4js.getLogger();
+
+    const program = new commander.Command();
+
+    showSplash();
+    
+    program
+      .version("1.0.0")
+      .description(
+        "Build a Single Executable Application (SEA) from a Node.js project"
+      )
+      .requiredOption("-i, --input <file>", "Input file (e.g. server.ts)")
+      .option(
+        "-icon, --icon <file>",
+        "Icon file (e.g. icon.ico) [Windows only]"
+      )
+      .requiredOption(
+        "-p, --platform <platform>",
+        "Target platform (win32, linux, or macos)"
+      )
+      .parse(process.argv);
 
     if (process.argv.length < 2) {
       showSplash();
