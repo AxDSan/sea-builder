@@ -40,9 +40,13 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
       console.log(
         "  -p, --platform <platform>  Target platform (win32, linux, or macos)"
       );
+      console.log(
+        "  -o, --obfuscate  Obfuscate the output file using js-confuser"
+      );
       console.log("");
       console.log("Examples:");
       console.log("  sea-builder -i server.ts -p win32");
+      console.log("  sea-builder -i server.ts -p win32 --obfuscate");
       console.log("  sea-builder -i server.ts -p linux");
       console.log("  sea-builder -i server.ts -p macos");
       console.log("");
@@ -62,7 +66,7 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
     const program = new commander.Command();
 
     showSplash();
-    
+
     program
       .version("1.0.0")
       .description(
@@ -77,6 +81,7 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
         "-p, --platform <platform>",
         "Target platform (win32, linux, or macos)"
       )
+      .option("-o, --obfuscate", "Obfuscate the output file using js-confuser")
       .parse(process.argv);
 
     if (process.argv.length < 2) {
@@ -106,9 +111,11 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
         await bundleProject(input);
         logger.info(chalk.green("Bundle completed successfully"));
 
-        // Step 2: Obfuscate the bundled output file using js-confuser
-        await obfuscateOutputFile(outputFile);
-        logger.info(chalk.green("Obfuscation completed successfully"));
+        // Step 2: Obfuscate the bundled output file using js-confuser (if the --obfuscate option was provided)
+        if (program.opts().obfuscate) {
+          await obfuscateOutputFile(outputFile);
+          logger.info(chalk.green("Obfuscation completed successfully"));
+        }
 
         // Step 2: Generate the SEA preparation blob
         await generateSEABlob(seaConfig);
@@ -142,16 +149,29 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
     }
 
     async function obfuscateOutputFile(outputFile) {
-      const code = fs.readFileSync(outputFile, 'utf-8');
+      const code = fs.readFileSync(outputFile, "utf-8");
       const obfuscated = await JsConfuser.obfuscate(code, {
         target: "node",
         preset: "low",
         lock: {
           integrity: true,
           selfDefending: true,
-          antiDebug: true
+          antiDebug: true,
         },
-        stringEncoding: false,
+        calculator: true,
+        compact: true,
+        hexadecimalNumbers: true,
+        controlFlowFlattening: 0.25,
+        dispatcher: 0.5,
+        duplicateLiteralsRemoval: true,
+        identifierGenerator: "randomized",
+        minify: false,
+        movedDeclarations: true,
+        objectExtraction: true,
+        opaquePredicates: 0.1,
+        renameVariables: true,
+        renameGlobals: true,
+        stringConcealing: true
       });
       fs.writeFileSync(outputFile, obfuscated);
     }
