@@ -16,6 +16,7 @@
     "commander": "^12.0.0",
     "esbuild": "^0.20.2",
     "figlet": "^1.7.0",
+    "js-confuser": "^1.7.1",
     "log4js": "^6.9.1",
     "postject": "^1.0.0-alpha.6",
     "rcedit": "^4.0.1"
