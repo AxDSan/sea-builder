@@ -45,7 +45,6 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
       );
       console.log("");
       console.log("Examples:");
-      console.log("  sea-builder -i server.ts -p win32");
       console.log("  sea-builder -i server.ts -p win32 --obfuscate");
       console.log("  sea-builder -i server.ts -p linux");
       console.log("  sea-builder -i server.ts -p macos");
@@ -95,6 +94,7 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
     const seaConfig = {
       main: outputFile,
       output: "sea-prep.blob",
+      disableExperimentalSEAWarning: true
     };
 
     const executableOutputPath = getExecutableOutputPath(platform);
@@ -103,9 +103,6 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
       showSplash();
 
       try {
-        logger.info(
-          chalk.bold.cyan("SEA-Builder") + " started at " + new Date()
-        );
 
         // Step 1: Bundle the Node.js project using ESBuild
         await bundleProject(input);
@@ -136,10 +133,6 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
         );
         logger.info(chalk.green("SEA blob injected successfully"));
 
-        // Step 6: Finished
-        logger.info(
-          chalk.bold.cyan("SEA-Builder") + " finished at " + new Date()
-        );
       } catch (error) {
         logger.error(
           chalk.red("An unexpected error occurred: ") + error.message
@@ -309,6 +302,7 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
       try {
         await postject.inject(nodeExecutable, "NODE_SEA_BLOB", seaBlobBuffer, {
           sentinelFuse: FUSE_STRING,
+          machoSegmentName: platform === 'macos'? "NODE_SEA" : undefined
         });
       } catch (error) {
         throw new Error(`Error injecting SEA blob: ${error.message}`);
