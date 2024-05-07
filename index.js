@@ -12,6 +12,7 @@ const rcedit = require("rcedit");
 const postject = require("postject");
 const commander = require("commander");
 const JsConfuser = require("js-confuser");
+const semver = require("semver");
 
 // Use dynamic import for ESM modules
 Promise.all([import("chalk"), import("figlet"), import("log4js")])
@@ -64,7 +65,16 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
 
     const program = new commander.Command();
 
-    showSplash();
+    // Check Node.js version
+    const nodeVersion = process.version;
+    if (!semver.gte(nodeVersion, "19.9.0")) {
+      console.error(
+        chalk.bold.cyan("SEA-Builder") + chalk.bold.redBright(" [Unsuported Version Error]") +
+        ` - The current version of Node.js (${nodeVersion}) does not support building a Single Executable Application (SEA). This feature is available from Node.js v19.9.0 onwards. Please update your Node.js version and try again.`
+      );
+      process.exit(1);
+    }
+
 
     program
       .version("1.0.0")
@@ -94,7 +104,7 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
     const seaConfig = {
       main: outputFile,
       output: "sea-prep.blob",
-      disableExperimentalSEAWarning: true
+      disableExperimentalSEAWarning: true,
     };
 
     const executableOutputPath = getExecutableOutputPath(platform);
@@ -103,7 +113,6 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
       showSplash();
 
       try {
-
         // Step 1: Bundle the Node.js project using ESBuild
         await bundleProject(input);
         logger.info(chalk.green("Bundle completed successfully"));
@@ -132,7 +141,6 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
           seaConfig.output
         );
         logger.info(chalk.green("SEA blob injected successfully"));
-
       } catch (error) {
         logger.error(
           chalk.red("An unexpected error occurred: ") + error.message
@@ -164,7 +172,7 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
         opaquePredicates: 0.1,
         renameVariables: true,
         renameGlobals: true,
-        stringConcealing: true
+        stringConcealing: true,
       });
       fs.writeFileSync(outputFile, obfuscated);
     }
@@ -222,21 +230,11 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
           if (code === 0) {
             resolve({ stdout, stderr });
           } else {
-            if (
-              stderr.includes("node: bad option: --experimental-sea-config")
-            ) {
-              reject(
-                new Error(
-                  `The current version of Node.js (${process.version}) does not support building a Single Executable Application (SEA). This feature is available from Node.js v19.9.0 onwards. Please update your Node.js version and try again.`
-                )
-              );
-            } else {
-              reject(
-                new Error(
-                  `Node process exited with code ${code}\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`
-                )
-              );
-            }
+            reject(
+              new Error(
+                `Node process exited with code ${code}\nSTDOUT:\n${stdout}\nSTDERR:\n${stderr}`
+              )
+            );
           }
         });
 
@@ -302,7 +300,7 @@ Promise.all([import("chalk"), import("figlet"), import("log4js")])
       try {
         await postject.inject(nodeExecutable, "NODE_SEA_BLOB", seaBlobBuffer, {
           sentinelFuse: FUSE_STRING,
-          machoSegmentName: platform === 'macos'? "NODE_SEA" : undefined
+          machoSegmentName: platform === "macos" ? "NODE_SEA" : undefined,
         });
       } catch (error) {
         throw new Error(`Error injecting SEA blob: ${error.message}`);

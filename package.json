@@ -19,6 +19,7 @@
     "js-confuser": "^1.7.1",
     "log4js": "^6.9.1",
     "postject": "^1.0.0-alpha.6",
-    "rcedit": "^4.0.1"
+    "rcedit": "^4.0.1",
+    "semver": "^7.6.0"
   }
 }
