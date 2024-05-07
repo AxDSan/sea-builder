@@ -14,6 +14,7 @@ Build a Single Executable Application (SEA) from a Node.js project with ease. SE
 - **Customizable**: Set your application's icon on Windows and specify the output executable name.
 - **Efficient**: Utilizes `esbuild` for fast bundling of your Node.js project.
 - **Logging**: Detailed logs help you track the build process and troubleshoot issues.
+- **Security** *(Optional)*: Implements obfuscation that allows you to be a step ahead of those pesky reverse engineers.
 
 ## Installation
 
@@ -42,6 +43,7 @@ sea-builder -i server.ts -p win32
 - `-i, --input <file>`: Input file (e.g., `server.ts`).
 - `-icon, --icon <file>`: Icon file (e.g., `icon.ico`) [Windows only].
 - `-p, --platform <platform>`: Target platform (`win32`, `linux`, or `macos`).
+- `-o, --obfuscate`: *(Optional)* Obfuscates the produced bundled script right before baking it into the executable.
 
 ## Examples
 
